@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phrase Search - Vector Search</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 50px 0;
+        }
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .search-title {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .search-form {
+            margin-bottom: 40px;
+        }
+        .btn-search {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px 40px;
+            font-weight: bold;
+        }
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .results-container {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .emotion-badge {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+        }
+        .phrase-item {
+            transition: all 0.3s;
+            border-left: 4px solid #667eea;
+            margin-bottom: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .phrase-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .progress {
+            height: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <h1 class="search-title">
+                <i class="bi bi-search"></i> Semantic Phrase Search
+            </h1>
+            
+            <!-- Search form -->
+            <div class="search-form">
+                <form id="searchForm">
+                    <div class="input-group input-group-lg">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="searchInput" 
+                            placeholder="How do you feel?..." 
+                            required
+                            aria-label="I'm feeling..."
+                        >
+                        <button class="btn btn-primary btn-search" type="submit">
+                            <i class="bi bi-search"></i> Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Loading indicator -->
+            <div class="loading" id="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3 text-muted">Searching for results...</p>
+            </div>
+
+            <!-- Results container -->
+            <div class="results-container" id="resultsContainer">
+                <!-- Emotional state -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="alert alert-info d-flex align-items-center" role="alert">
+                            <i class="bi bi-emoji-smile me-3 fs-3"></i>
+                            <div>
+                                <h5 class="alert-heading mb-1">Emotional State</h5>
+                                <span class="emotion-badge badge bg-primary" id="emotionValue"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ranking -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5 class="mb-3">
+                            <i class="bi bi-graph-up"></i> Match Level
+                        </h5>
+                        <div class="progress">
+                            <div 
+                                class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                                role="progressbar" 
+                                id="rankingBar"
+                                style="width: 0%"
+                                aria-valuenow="0" 
+                                aria-valuemin="0" 
+                                aria-valuemax="100"
+                            >
+                                <span id="rankingValue">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phrases list -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5 class="mb-3">
+                            <i class="bi bi-list-ul"></i> Found Phrases
+                        </h5>
+                        <div id="phrasesList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // API Configuration
+        const API_URL = 'http://localhost:52773/vectorsearch/api/search'; 
+
+        // DOM Elements
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const loading = document.getElementById('loading');
+        const emotionValue = document.getElementById('emotionValue');
+        const rankingBar = document.getElementById('rankingBar');
+        const rankingValue = document.getElementById('rankingValue');
+        const phrasesList = document.getElementById('phrasesList');
+
+        // Form handler
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const searchText = searchInput.value.trim();
+            if (!searchText) return;
+
+            // Show loading indicator
+            loading.style.display = 'block';
+            resultsContainer.style.display = 'none';
+
+            try {
+                // API call
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ phrase: searchText })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error in API response');
+                }
+
+                const data = await response.json();
+                
+                // Display results
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Show example data in case of error (for demonstration)
+                const mockData = {
+                    emotion: 'Positive',
+                    ranking: 87.5,
+                    phrases: [
+                        'This is a very similar example phrase',
+                        'Another phrase related to the search',
+                        'Third phrase that matches the criteria',
+                        'Fourth phrase found in the database',
+                        'Fifth phrase with relevant content'
+                    ]
+                };
+                
+                displayResults(mockData);
+                
+                // Show error message (optional)
+                console.warn('Showing example data. Configure the API URL correctly.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        // Function to display results
+        function displayResults(data) {
+            // Emotional state
+            emotionValue.textContent = data.emotion || 'Not available';
+            
+            // Ranking
+            const ranking = data.ranking || 0;
+            rankingBar.style.width = ranking + '%';
+            rankingBar.setAttribute('aria-valuenow', ranking);
+            rankingValue.textContent = ranking.toFixed(1) + '%';
+            
+            // Change bar color based on percentage
+            rankingBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
+            if (ranking >= 75) {
+                rankingBar.classList.add('bg-success');
+            } else if (ranking >= 50) {
+                rankingBar.classList.add('bg-warning');
+            } else {
+                rankingBar.classList.add('bg-danger');
+            }
+            
+            // Phrases list
+            phrasesList.innerHTML = '';
+            if (data.phrases && data.phrases.length > 0) {
+                data.phrases.forEach((phrase, index) => {
+                    const phraseElement = document.createElement('div');
+                    phraseElement.className = 'phrase-item';
+                    phraseElement.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-secondary me-3">${index + 1}</span>
+                            <span>${phrase}</span>
+                        </div>
+                    `;
+                    phrasesList.appendChild(phraseElement);
+                });
+            } else {
+                phrasesList.innerHTML = '<p class="text-muted">No phrases found.</p>';
+            }
+            
+            // Show results container
+            resultsContainer.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

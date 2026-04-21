@@ -1,0 +1,41 @@
+Class St.Vectorsearch.Demo.BO.Feeling Extends Ens.BusinessOperation
+{
+
+Parameter INVOCATION = "InProc";
+
+Method SearchFeeling(pRequest As Ens.StringRequest, Output pResponse As St.Vectorsearch.Demo.Msg.FeelingResponse) As %Status
+{
+    set tSC = $$$OK
+    set pResponse = ##class(St.Vectorsearch.Demo.Msg.FeelingResponse).%New()
+    set vector = pRequest.StringValue
+    set tStatement = ##class(%SQL.Statement).%New()
+    set sql(1) = " SELECT TOP 5 Text, Value, ROUND(VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) * 100, 4) AS Percentage "
+    set sql(2) = " FROM St_Vectorsearch.Feeling "
+    set sql(3) = " ORDER BY VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) DESC"
+    set sql = 3
+    set tSC = tStatement.%Prepare(.sql)
+    If $$$ISERR(tSC) { Return tSC }
+    set tResultSet = tStatement.%Execute(vector, vector)
+    set tSC = tResultSet.%SQLCODE
+    If tSC<0 { Return $$$ERROR($$$GeneralError, "Error executing vector search query") }
+
+    while tResultSet.%Next() {
+        set node = ##class(St.Vectorsearch.Demo.Msg.Feeling).%New()
+        set node.Text = tResultSet.%Get("Text")
+        set node.Value = tResultSet.%Get("Value")
+        set node.Percentage = tResultSet.%Get("Percentage")
+        do pResponse.Feelings.Insert(node)
+    }
+    Return $$$OK
+}
+
+XData MessageMap
+{
+<MapItems>
+	<MapItem MessageType="Ens.StringRequest">
+		<Method>SearchFeeling</Method>
+	</MapItem>
+</MapItems>
+}
+
+}
