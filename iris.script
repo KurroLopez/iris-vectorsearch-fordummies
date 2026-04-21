@@ -1,0 +1,20 @@
+  zn "%SYS"
+  Do ##class(Security.Users).UnExpireUserPasswords("*")
+  set prop("DeepSeeEnabled")=1
+  do ##class(Security.Applications).Modify("/csp/user",.prop)
+  zn "USER"
+  ;set version="latest" 
+  ;set request=##class(%Net.HttpRequest).%New()
+  ;set request.Server="pm.community.intersystems.com"
+  ;set request.SSLConfiguration="ISC.FeatureTracker.SSL.Config" 
+  ;do request.Get("/packages/zpm/"_version_"/installer")
+  ;do $system.OBJ.LoadStream(request.HttpResponse.Data,"c")
+  zpm "enable -community"
+  zpm "install iris-deploy-tools -v"
+  hang 2
+  ;do $system.OBJ.Import("/opt/irisbuild/src/St/Vectorsearch","ck")
+  ;do ##class(St.Vectorsearch.Data).Init()
+  ;do ##class(St.Vectorsearch.Demo.Deploy).Deploy()
+  ;do ##class(%File).CopyFile("/opt/irisbuild/src/Web/index.html", "/usr/irissys/csp/user/index.html", 0, .return)
+  hang 2
+  halt
