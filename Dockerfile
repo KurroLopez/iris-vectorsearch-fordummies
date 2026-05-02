@@ -1,4 +1,4 @@
-ARG IMAGE=intersystemsdc/irishealth-community
+ARG IMAGE=containers.intersystems.com/intersystems/iris-community:latest-em
 FROM $IMAGE
 USER root
 WORKDIR /opt/irisbuild
@@ -10,7 +10,8 @@ COPY src src
 COPY data data
 COPY iris.script iris.script
 COPY requirements.txt requirements.txt
-RUN pip3 install -U -r requirements.txt
+RUN python3 -m venv .venv
+RUN bash -c "source .venv/bin/activate && pip install -U -r requirements.txt"
 
 RUN iris start IRIS \
     && iris session IRIS < iris.script \
