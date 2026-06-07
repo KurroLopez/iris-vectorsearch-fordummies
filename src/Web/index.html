@@ -172,7 +172,7 @@
     
     <script>
         // API Configuration
-        const API_URL = 'http://localhost:52773/vectorsearch/api/search'; 
+        const SEARCH_API_URL = '/vector/api/feeling'; 
 
         // DOM Elements
         const searchForm = document.getElementById('searchForm');
@@ -197,16 +197,16 @@
 
             try {
                 // API call
-                const response = await fetch(API_URL, {
+                const response = await fetch(SEARCH_API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ phrase: searchText })
+                    body: JSON.stringify({ text: searchText })
                 });
 
-                if (!response) {
-                    throw new Error('Error in API response');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 const data = await response.json();
@@ -241,14 +241,20 @@
 
         // Function to display results
         function displayResults(data) {
-            // Emotional state
-            emotionValue.textContent = data.emotion || 'Not available';
+            // Extract Feelings array
+            const feelings = data.Feelings || [];
             
-            // Ranking
-            const ranking = data.ranking || 0;
+            // Emotional state - use Value from first result (1=joy, 0=sadness, etc.)
+            const emotionNames = ['Sadness', 'Joy', 'Love', 'Anger', 'Fear'];
+            const firstFeeling = feelings.length > 0 ? feelings[0] : null;
+            const emotionValue_text = firstFeeling ? emotionNames[firstFeeling.Value] || 'Unknown' : 'Not available';
+            emotionValue.textContent = emotionValue_text;
+            
+            // Ranking - use Percentage from first result
+            const ranking = firstFeeling ? firstFeeling.Percentage : 0;
             rankingBar.style.width = ranking + '%';
             rankingBar.setAttribute('aria-valuenow', ranking);
-            rankingValue.textContent = ranking.toFixed(1) + '%';
+            rankingValue.textContent = ranking.toFixed(2) + '%';
             
             // Change bar color based on percentage
             rankingBar.className = 'progress-bar progress-bar-striped progress-bar-animated';
@@ -262,14 +268,17 @@
             
             // Phrases list
             phrasesList.innerHTML = '';
-            if (data.phrases && data.phrases.length > 0) {
-                data.phrases.forEach((phrase, index) => {
+            if (feelings && feelings.length > 0) {
+                feelings.forEach((feeling, index) => {
                     const phraseElement = document.createElement('div');
                     phraseElement.className = 'phrase-item';
                     phraseElement.innerHTML = `
-                        <div class="d-flex align-items-center">
-                            <span class="badge bg-secondary me-3">${index + 1}</span>
-                            <span>${phrase}</span>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                <span class="badge bg-secondary me-3">${index + 1}</span>
+                                <span>${feeling.Text}</span>
+                            </div>
+                            <span class="badge bg-info ms-3">${feeling.Percentage.toFixed(2)}%</span>
                         </div>
                     `;
                     phrasesList.appendChild(phraseElement);
