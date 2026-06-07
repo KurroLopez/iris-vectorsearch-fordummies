@@ -2,7 +2,7 @@ Dataset:
 https://www.kaggle.com/datasets/parulpandey/emotion-dataset
 https://www.kaggle.com/datasets/harshitshankhdhar/imdb-dataset-of-top-1000-movies-and-tv-shows
 
-sClasification
+Clasification
 sadness (0)
 joy (1)
 love (2)
