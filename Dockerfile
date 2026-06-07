@@ -30,11 +30,3 @@ USER ${ISC_PACKAGE_MGRUSER}
 RUN iris start IRIS \
     && iris session IRIS < iris.script \
     && iris stop IRIS quietly 
-
-# Puerto que expone Flask
-# EXPOSE 5000
-
-# # Variables de entorno
-# ENV PORT=5000
-# ENV PYTHONUNBUFFERED=1
-# ENV PYTHONDONTWRITEBYTECODE=1

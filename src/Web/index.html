@@ -123,7 +123,7 @@
                 <div class="row mb-4">
                     <div class="col-md-12">
                         <div class="alert alert-info d-flex align-items-center" role="alert">
-                            <i class="bi bi-emoji-smile me-3 fs-3"></i>
+                            <i id="emotionIcon"></i>
                             <div>
                                 <h5 class="alert-heading mb-1">Emotional State</h5>
                                 <span class="emotion-badge badge bg-primary" id="emotionValue"></span>
@@ -180,6 +180,7 @@
         const resultsContainer = document.getElementById('resultsContainer');
         const loading = document.getElementById('loading');
         const emotionValue = document.getElementById('emotionValue');
+        const emotionIcon = document.getElementById('emotionIcon');
         const rankingBar = document.getElementById('rankingBar');
         const rankingValue = document.getElementById('rankingValue');
         const phrasesList = document.getElementById('phrasesList');
@@ -245,9 +246,18 @@
             const feelings = data.Feelings || [];
             
             // Emotional state - use Value from first result (1=joy, 0=sadness, etc.)
+            const emotionIcons = ['bi-emoji-tear', 'bi-emoji-smile', 'bi-emoji-heart-eyes', 'bi-emoji-angry', 'bi-emoji-grimace'];
             const emotionNames = ['Sadness', 'Joy', 'Love', 'Anger', 'Fear'];
             const firstFeeling = feelings.length > 0 ? feelings[0] : null;
             const emotionValue_text = firstFeeling ? emotionNames[firstFeeling.Value] || 'Unknown' : 'Not available';
+            emotionValue.textContent = emotionValue_text;
+            
+            // Update emotion icon based on Value
+            if (firstFeeling !== null) {
+                emotionIcon.className = 'bi ' + emotionIcons[firstFeeling.Value] + ' me-3 fs-3';
+            } else {
+                emotionIcon.className = 'bi bi-emoji-neutral me-3 fs-3';
+            }
             emotionValue.textContent = emotionValue_text;
             
             // Ranking - use Percentage from first result
@@ -276,7 +286,7 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center flex-grow-1">
                                 <span class="badge bg-secondary me-3">${index + 1}</span>
-                                <span>${feeling.Text} (${feeling.Description})</span>
+                                <span>${feeling.Text}</span>
                             </div>
                             <span class="badge bg-info ms-3">${feeling.Percentage.toFixed(2)}%</span>
                         </div>

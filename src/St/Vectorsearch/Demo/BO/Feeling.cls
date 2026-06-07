@@ -9,7 +9,7 @@ Method SearchFeeling(pRequest As St.Vectorsearch.Demo.Msg.FeelingRequest, Output
     set pResponse = ##class(St.Vectorsearch.Demo.Msg.FeelingResponse).%New()
     set vector = pRequest.Message
     set tStatement = ##class(%SQL.Statement).%New()
-    set sql($INCREMENT(i)) = " SELECT TOP 5 Text, Value, ROUND(VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) * 100, 4) AS Percentage "
+    set sql($INCREMENT(i)) = " SELECT TOP 5 Text, Value, ROUND(VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) * 100, 4) AS Percentage, D.Description "
     set sql($INCREMENT(i)) = " FROM St_Vectorsearch.Feeling "
     set sql($INCREMENT(i)) = " LEFT JOIN St_Vectorsearch.DescFeeling AS D ON Feeling.Value = D.Id "
     set sql($INCREMENT(i)) = " ORDER BY VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) DESC"

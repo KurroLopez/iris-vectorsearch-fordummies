@@ -22,6 +22,7 @@ ClassMethod Init() As %Status
 
     Set tSC = tStatement.%Prepare("LOAD DATA FROM FILE '/opt/irisbuild/data/descfeeling.csv' INTO St_Vectorsearch.DescFeeling(Id, Description)")
     If $$$ISERR(tSC) { Return tSC }
+    Set tResult = tStatement.%Execute()
 
     return $$$OK
 }
