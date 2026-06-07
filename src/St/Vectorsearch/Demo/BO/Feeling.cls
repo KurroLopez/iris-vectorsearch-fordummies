@@ -9,10 +9,11 @@ Method SearchFeeling(pRequest As St.Vectorsearch.Demo.Msg.FeelingRequest, Output
     set pResponse = ##class(St.Vectorsearch.Demo.Msg.FeelingResponse).%New()
     set vector = pRequest.Message
     set tStatement = ##class(%SQL.Statement).%New()
-    set sql(1) = " SELECT TOP 5 Text, Value, ROUND(VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) * 100, 4) AS Percentage "
-    set sql(2) = " FROM St_Vectorsearch.Feeling "
-    set sql(3) = " ORDER BY VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) DESC"
-    set sql = 3
+    set sql($INCREMENT(i)) = " SELECT TOP 5 Text, Value, ROUND(VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) * 100, 4) AS Percentage "
+    set sql($INCREMENT(i)) = " FROM St_Vectorsearch.Feeling "
+    set sql($INCREMENT(i)) = " LEFT JOIN St_Vectorsearch.DescFeeling AS D ON Feeling.Value = D.Id "
+    set sql($INCREMENT(i)) = " ORDER BY VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) DESC"
+    set sql = i
     set tSC = tStatement.%Prepare(.sql)
     If $$$ISERR(tSC) { Return tSC }
     set tResultSet = tStatement.%Execute(vector, vector)
@@ -24,6 +25,7 @@ Method SearchFeeling(pRequest As St.Vectorsearch.Demo.Msg.FeelingRequest, Output
         set node.Text = tResultSet.%Get("Text")
         set node.Value = tResultSet.%Get("Value")
         set node.Percentage = tResultSet.%Get("Percentage")
+        set node.Description = tResultSet.%Get("Description")
         do pResponse.Feelings.Insert(node)
     }
     Return $$$OK

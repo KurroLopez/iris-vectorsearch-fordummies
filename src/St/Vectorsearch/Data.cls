@@ -10,6 +10,18 @@ ClassMethod Init() As %Status
     set tSC = tStatement.%Prepare("CREATE INDEX IDX_Feeling_Vector ON St_Vectorsearch.Feeling(Vector)")
     If $$$ISERR(tSC) { Return tSC }
     set tResultSet = tStatement.%Execute()
+    set tSC = tStatement.%Prepare("CREATE TABLE St_Vectorsearch.DescFeeling ( Id INT PRIMARY KEY, Description VARCHAR(1024) )")
+    If $$$ISERR(tSC) { Return tSC }
+    set tResultSet = tStatement.%Execute()
+
+    Set tStatement = ##class(%SQL.Statement).%New()
+    Set tSC = tStatement.%Prepare("TRUNCATE TABLE St_Vectorsearch.DescFeeling")
+    write "Truncating table St_Vectorsearch.DescFeeling",!
+    If $$$ISERR(tSC) { Return tSC }
+    Set tResult = tStatement.%Execute()
+
+    Set tSC = tStatement.%Prepare("LOAD DATA FROM FILE '/opt/irisbuild/data/descfeeling.csv' INTO St_Vectorsearch.DescFeeling(Id, Description)")
+    If $$$ISERR(tSC) { Return tSC }
 
     return $$$OK
 }

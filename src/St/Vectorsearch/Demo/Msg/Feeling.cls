@@ -9,6 +9,8 @@ Property Value As %Integer;
 
 Property Percentage As %Decimal(SCALE = 2);
 
+Property Description As %String(MAXLEN = 1024);
+
 /// Percentage
 Storage Default
 {
@@ -21,6 +23,9 @@ Storage Default
 </Value>
 <Value name="3">
 <Value>Percentage</Value>
+</Value>
+<Value name="4">
+<Value>Description</Value>
 </Value>
 </Data>
 <Description>
