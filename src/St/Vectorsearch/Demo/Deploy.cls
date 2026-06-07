@@ -11,7 +11,7 @@ ClassMethod Deploy()
     do ..AddItem(production, "St.Vectorsearch.Demo.BO.Feeling", "St.Vectorsearch.Demo.BO.Feeling")
 
     // Add default parameters
-    do ..AddDefaultSetting(production,,"St.Vectorsearch.Demo.BS.Rest","BPClass","St.Vectorsearch.Demo.BO.Feeling")
+    do ..AddDefaultSetting(production,,"St.Vectorsearch.Demo.BS.Rest","BPClass","St.Vectorsearch.Demo.BP.Feeling")
 
     // Add API Services
     do ..RegisterWebApplication(currentNamespace, "/vector/api","St.Vectorsearch.Demo.BS.Rest")

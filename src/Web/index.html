@@ -172,8 +172,7 @@
     
     <script>
         // API Configuration
-        const EMBEDDING_API_URL = 'http://localhost:5000/embedding';
-        const SEARCH_API_URL = 'http://localhost:52773/vectorsearch/api/search';
+        const API_URL = 'http://localhost:52773/vectorsearch/api/search'; 
 
         // DOM Elements
         const searchForm = document.getElementById('searchForm');
@@ -197,42 +196,20 @@
             resultsContainer.style.display = 'none';
 
             try {
-                // 1) Calculate the embedding in Flask
-                const embeddingResponse = await fetch(EMBEDDING_API_URL, {
+                // API call
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ text: searchText })
+                    body: JSON.stringify({ phrase: searchText })
                 });
 
-                if (!embeddingResponse.ok) {
-                    throw new Error('Error in embedding API response');
+                if (!response) {
+                    throw new Error('Error in API response');
                 }
 
-                const embeddingData = await embeddingResponse.json();
-
-                if (!embeddingData.vector || !Array.isArray(embeddingData.vector)) {
-                    throw new Error('Embedding API did not return a vector');
-                }
-
-                // 2) Use the vector to query IRIS search
-                const searchResponse = await fetch(SEARCH_API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        phrase: searchText,
-                        vector: embeddingData.vector
-                    })
-                });
-
-                if (!searchResponse.ok) {
-                    throw new Error('Error in search API response');
-                }
-
-                const data = await searchResponse.json();
+                const data = await response.json();
                 
                 // Display results
                 displayResults(data);
@@ -242,14 +219,14 @@
                 
                 // Show example data in case of error (for demonstration)
                 const mockData = {
-                    emotion: 'Positive',
-                    ranking: 87.5,
+                    emotion: '',
+                    ranking: 0,
                     phrases: [
-                        'This is a very similar example phrase',
-                        'Another phrase related to the search',
-                        'Third phrase that matches the criteria',
-                        'Fourth phrase found in the database',
-                        'Fifth phrase with relevant content'
+                        '------------------------',
+                        '------------------------',
+                        '------------------------',
+                        '------------------------',
+                        '------------------------'
                     ]
                 };
                 
