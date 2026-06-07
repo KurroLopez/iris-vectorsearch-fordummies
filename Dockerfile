@@ -32,9 +32,9 @@ RUN iris start IRIS \
     && iris stop IRIS quietly 
 
 # Puerto que expone Flask
-EXPOSE 5000
+# EXPOSE 5000
 
-# Variables de entorno
-ENV PORT=5000
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
+# # Variables de entorno
+# ENV PORT=5000
+# ENV PYTHONUNBUFFERED=1
+# ENV PYTHONDONTWRITEBYTECODE=1

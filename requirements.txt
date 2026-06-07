@@ -1,5 +1,5 @@
-flask
-flask-cors
+# flask
+# flask-cors
 sentence-transformers
 torch
 --extra-index-url https://download.pytorch.org/whl/cpu

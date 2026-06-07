@@ -17,7 +17,6 @@ XData BPL [ XMLNamespace = "http://www.intersystems.com/bpl" ]
 <sequence xend='200' yend='650' >
 <call name='Calculate Embedding' target='St.Vectorsearch.Demo.BO.Feeling' async='1' xpos='200' ypos='250' >
 <request type='Ens.StringRequest' >
-<assign property="callrequest.Message" value="request.StringValue" action="set" />
 <assign property="callrequest.StringValue" value="request.StringValue" action="set" />
 </request>
 <response type='Ens.StringRequest' >
@@ -27,7 +26,7 @@ XData BPL [ XMLNamespace = "http://www.intersystems.com/bpl" ]
 <sync name='Wait calculate' calls='Calculate Embedding' type='all' xpos='200' ypos='350' />
 <call name='call search feeling' target='St.Vectorsearch.Demo.BO.Feeling' async='1' xpos='200' ypos='450' >
 <request type='St.Vectorsearch.Demo.Msg.FeelingRequest' >
-<assign property="callrequest.Message" value="context.Vector.Message" action="set" />
+<assign property="callrequest" value="context.Vector" action="set" />
 </request>
 <response type='St.Vectorsearch.Demo.Msg.FeelingResponse' >
 <assign property="response" value="callresponse" action="set" />
