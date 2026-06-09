@@ -245,23 +245,65 @@
             // Extract Feelings array
             const feelings = data.Feelings || [];
             
-            // Emotional state - use Value from first result (1=joy, 0=sadness, etc.)
+            // Find the emotion with highest average percentage
+            let emotionStats = {};
+            feelings.forEach(feeling => {
+                if (!emotionStats[feeling.Value]) {
+                    emotionStats[feeling.Value] = {
+                        count: 0,
+                        totalPercentage: 0,
+                        maxPercentage: 0,
+                        feelings: []
+                    };
+                }
+                emotionStats[feeling.Value].count++;
+                emotionStats[feeling.Value].totalPercentage += feeling.Percentage;
+                emotionStats[feeling.Value].maxPercentage = Math.max(emotionStats[feeling.Value].maxPercentage, feeling.Percentage);
+                emotionStats[feeling.Value].feelings.push(feeling);
+            });
+            
+            // Calculate average percentage for each emotion and find the best one
+            let bestValue = 0;
+            let bestScore = -1;
+            for (let value in emotionStats) {
+                const avgPercentage = emotionStats[value].totalPercentage / emotionStats[value].count;
+                // Score = average percentage * frequency (combines both frequency and quality)
+                const score = avgPercentage * emotionStats[value].count;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestValue = value;
+                }
+            }
+            
+            // Get the feeling with highest percentage for the best emotion
+            const mainFeeling = emotionStats[bestValue].feelings.reduce((max, current) => 
+                current.Percentage > max.Percentage ? current : max
+            );
+            
+            // Calculate average percentage for the main emotion
+            const avgPercentageForMainEmotion = emotionStats[bestValue].totalPercentage / emotionStats[bestValue].count;
+            
+            // Create a synthetic mainFeeling with average percentage
+            const mainFeelingWithAvg = {
+                ...mainFeeling,
+                Percentage: avgPercentageForMainEmotion
+            };
+            
+            // Emotional state - use the best emotion
             const emotionIcons = ['bi-emoji-tear', 'bi-emoji-smile', 'bi-emoji-heart-eyes', 'bi-emoji-angry', 'bi-emoji-grimace'];
             const emotionNames = ['Sadness', 'Joy', 'Love', 'Anger', 'Fear'];
-            const firstFeeling = feelings.length > 0 ? feelings[0] : null;
-            const emotionValue_text = firstFeeling ? emotionNames[firstFeeling.Value] || 'Unknown' : 'Not available';
+            const emotionValue_text = mainFeelingWithAvg ? emotionNames[mainFeelingWithAvg.Value] || 'Unknown' : 'Not available';
             emotionValue.textContent = emotionValue_text;
             
             // Update emotion icon based on Value
-            if (firstFeeling !== null) {
-                emotionIcon.className = 'bi ' + emotionIcons[firstFeeling.Value] + ' me-3 fs-3';
+            if (mainFeelingWithAvg !== null) {
+                emotionIcon.className = 'bi ' + emotionIcons[mainFeelingWithAvg.Value] + ' me-3 fs-3';
             } else {
                 emotionIcon.className = 'bi bi-emoji-neutral me-3 fs-3';
             }
-            emotionValue.textContent = emotionValue_text;
             
-            // Ranking - use Percentage from first result
-            const ranking = firstFeeling ? firstFeeling.Percentage : 0;
+            // Ranking - use average percentage for the best emotion
+            const ranking = mainFeelingWithAvg ? mainFeelingWithAvg.Percentage : 0;
             rankingBar.style.width = ranking + '%';
             rankingBar.setAttribute('aria-valuenow', ranking);
             rankingValue.textContent = ranking.toFixed(2) + '%';

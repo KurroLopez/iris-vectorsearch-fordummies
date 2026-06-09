@@ -23,7 +23,7 @@ ClassMethod FeelingPost() As %Status
         set %response.CharSet = "utf-8"
         set %response.ContentType="application/json"
         set dynamic = ##class(%Library.DynamicObject).%FromJSON(%request.Content)
-        set pRequest = ##class(Ens.StringRequest).%New(dynamic.text)
+        set pRequest = ##class(Ens.StringRequest).%New($zconvert(dynamic.text,"L"))
 
         set tSC = service.SendRequestSync(service.BPClass, pRequest, .pResponse)
         If $$$ISERR(tSC) { Throw ##class(%Exception.StatusException).CreateFromStatus(tSC) }
