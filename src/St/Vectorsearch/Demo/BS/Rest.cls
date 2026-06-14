@@ -5,14 +5,16 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
 {
 <Routes>
     <Route Url="(?i)/feeling" Method="POST" Call="FeelingPost"/>
+    <Route Url="(?i)/movies" Method="GET" Call="MovieGet"/>
 </Routes>
 }
 
 Property BPClass As %String(MAXLEN = "");
+Property BPClassMovie As %String(MAXLEN = "");
 
 Parameter CLASSBS = "St.Vectorsearch.Demo.BS.Rest";
 
-Parameter SETTINGS = "BPClass:Basic:selector?Select=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
+Parameter SETTINGS = "BPClass:Basic:selector?Select=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}, BPClassMovie:Basic:selector?Select=1&context={Ens.ContextSearch/ProductionItems?targets=1&productionName=@productionId}";
 
 ClassMethod FeelingPost() As %Status
 {

@@ -1,4 +1,4 @@
-Class St.Vectorsearch.Demo.Msg.FeelingRequest Extends (Ens.Response, %JSON.Adaptor)
+Class St.Vectorsearch.Demo.Msg.Feeling.FeelingRequest Extends (Ens.Request, %JSON.Adaptor)
 {
     Property Message AS %String(MAXLEN="");
 Storage Default

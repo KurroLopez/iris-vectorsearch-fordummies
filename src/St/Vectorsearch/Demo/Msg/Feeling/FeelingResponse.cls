@@ -1,8 +1,8 @@
-Class St.Vectorsearch.Demo.Msg.FeelingResponse Extends (Ens.Response, %JSON.Adaptor)
+Class St.Vectorsearch.Demo.Msg.Feeling.FeelingResponse Extends (Ens.Response, %JSON.Adaptor)
 {
 
 /// List of feelings
-Property Feelings As list Of St.Vectorsearch.Demo.Msg.Feeling;
+Property Feelings As list Of St.Vectorsearch.Demo.Msg.Feeling.Feeling;
 
 Storage Default
 {

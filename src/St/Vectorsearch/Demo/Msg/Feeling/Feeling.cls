@@ -1,4 +1,4 @@
-Class St.Vectorsearch.Demo.Msg.Feeling Extends (%SerialObject, %XML.Adaptor, %JSON.Adaptor)
+Class St.Vectorsearch.Demo.Msg.Feeling.Feeling Extends (%SerialObject, %XML.Adaptor, %JSON.Adaptor)
 {
 
 /// Text

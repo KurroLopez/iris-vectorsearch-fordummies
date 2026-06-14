@@ -3,10 +3,10 @@ Class St.Vectorsearch.Demo.BO.Feeling Extends Ens.BusinessOperation
 
 Parameter INVOCATION = "Queue";
 
-Method SearchFeeling(pRequest As St.Vectorsearch.Demo.Msg.FeelingRequest, Output pResponse As St.Vectorsearch.Demo.Msg.FeelingResponse) As %Status
+Method SearchFeeling(pRequest As St.Vectorsearch.Demo.Msg.Feeling.FeelingRequest, Output pResponse As St.Vectorsearch.Demo.Msg.Feeling.FeelingResponse) As %Status
 {
     set tSC = $$$OK
-    set pResponse = ##class(St.Vectorsearch.Demo.Msg.FeelingResponse).%New()
+    set pResponse = ##class(St.Vectorsearch.Demo.Msg.Feeling.FeelingResponse).%New()
     set vector = pRequest.Message
     set tStatement = ##class(%SQL.Statement).%New()
     set sql($INCREMENT(i)) = " SELECT TOP 5 Text, Value, ROUND(VECTOR_DOT_PRODUCT(Vector, TO_VECTOR(?, float)) * 100, 4) AS Percentage, D.Description "
@@ -21,7 +21,7 @@ Method SearchFeeling(pRequest As St.Vectorsearch.Demo.Msg.FeelingRequest, Output
     If tSC<0 { Return $$$ERROR($$$GeneralError, "Error executing vector search query") }
 
     while tResultSet.%Next() {
-        set node = ##class(St.Vectorsearch.Demo.Msg.Feeling).%New()
+        set node = ##class(St.Vectorsearch.Demo.Msg.Feeling.Feeling).%New()
         set node.Text = tResultSet.%Get("Text")
         set node.Value = tResultSet.%Get("Value")
         set node.Percentage = tResultSet.%Get("Percentage")
@@ -61,7 +61,7 @@ XData MessageMap
     <MapItem MessageType="Ens.StringRequest">
         <Method>GetEmbedding</Method>
     </MapItem>
-	<MapItem MessageType="St.Vectorsearch.Demo.Msg.FeelingRequest">
+	<MapItem MessageType="St.Vectorsearch.Demo.Msg.Feeling.FeelingRequest">
 		<Method>SearchFeeling</Method>
 	</MapItem>
 </MapItems>
