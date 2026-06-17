@@ -43,6 +43,9 @@ Class St.Vectorsearch.Demo.Msg.Movies.Movies Extends (%SerialObject, %XML.Adapto
     /// Fourth star of the movie
     Property Star4 As %String(MAXLEN = 255);
 
+    /// Percentage of similarity with the search vector
+    Property Percentage As %Decimal(SCALE = 4);
+
 Storage Default
 {
 <Data name="MoviesState">
@@ -87,6 +90,9 @@ Storage Default
 </Value>
 <Value name="14">
 <Value>Star4</Value>
+</Value>
+<Value name="15">
+<Value>Percentage</Value>
 </Value>
 </Data>
 <State>MoviesState</State>

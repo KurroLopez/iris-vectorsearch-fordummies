@@ -7,6 +7,7 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
     <Route Url="(?i)/feeling" Method="POST" Call="FeelingPost"/>
     <Route Url="(?i)/movies" Method="GET" Call="MovieGet"/>
     <Route Url="(?i)/movies/:id" Method="GET" Call="InfoMovieGet"/>
+    <Route Url="(?i)/movies/recommendations/:id" Method="GET" Call="RecomendationGet"/>
 </Routes>
 }
 
@@ -120,5 +121,40 @@ ClassMethod InfoMovieGet(id as %Integer) As %Status
 
     quit $$$OK
 
+}
+
+ClassMethod RecomendationGet(id as %Integer) As %Status
+{
+    set tSC = $$$OK
+    do ##class(Ens.Director).CreateBusinessService(..#CLASSBS, .service)
+
+    Try {
+        set %response.CharSet = "utf-8"
+        set %response.ContentType="application/json"
+        set pRequest = ##class(St.Vectorsearch.Demo.Msg.Movies.SearchMoviesRequest).%New()
+        set pRequest.Id = id
+
+        set tSC = service.SendRequestSync(service.BPClassMovies, pRequest, .pResponse)
+        If $$$ISERR(tSC) { Throw ##class(%Exception.StatusException).CreateFromStatus(tSC) }
+        set %response.Status= ..#HTTP200OK
+        set %response.CharSet = "utf-8"
+        set %response.ContentType = "application/json"
+        do pResponse.%JSONExportToStream(.tStream)
+        do tStream.OutputToDevice()
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+        set errorCode = $system.Status.GetErrorCodes(tSC)
+        Set msgError = $System.Status.GetOneStatusText(tSC,1)
+        set pError = ##class(%Library.DynamicObject).%New()
+        set %response.Status= ..#HTTP200OK
+        set %response.CharSet = "utf-8"
+        set %response.ContentType = "application/json"
+        set pError.code = errorCode
+        Set pError.message = msgError
+        write pError.%ToJSON()
+    }
+
+    quit $$$OK  
 }
 }
