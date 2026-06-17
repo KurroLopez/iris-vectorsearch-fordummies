@@ -148,9 +148,13 @@ ClassMethod PopulateMovie(truncate As %Boolean = 1) As %Status
         write "Processing ",pos," of ",total,!,/CUU(1)
         // Access the columns of the record
         if (tResultSet.Vector="") {
-            set text = "Movie year "_tResultSet.Year_" - Genre: "_tResultSet.Genre_" - Directed by "_tResultSet.Director_" - "
-            set text = text_" and starring by "_tResultSet.Star1_", "_tResultSet.Star2_", "_tResultSet.Star3_" and "_tResultSet.Star4_" - "
-            set text = text_" Sinopsis: "_tResultSet.Overview_". Ranking: "_tResultSet.Rating
+            set text = ""
+            set text = text_" - Overview: "_tResultSet.Overview
+            set text = text_" - Genre: "_tResultSet.Genre
+            set text = text_" - Directed by "_tResultSet.Director
+            set text = text_" - Starring by "_tResultSet.Star1_", "_tResultSet.Star2_", "_tResultSet.Star3_" and "_tResultSet.Star4
+            set text = text_" - Movie year "_tResultSet.Year
+            set text = text_" - Ranking: "_tResultSet.Rating
             do ..UpdateVectorMovie(tResultSet.ID, text)
             }
         Set pos = pos + 1
