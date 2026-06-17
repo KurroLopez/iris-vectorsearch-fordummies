@@ -1,5 +1,4 @@
   zn "%SYS"
-  set production="St.Vectorsearch.Demo.Production"
   Do ##class(Security.Users).UnExpireUserPasswords("*")
   set prop("DeepSeeEnabled")=1
   do ##class(Security.Applications).Modify("/csp/user",.prop)
@@ -21,6 +20,7 @@
   do ##class(St.Vectorsearch.Demo.Deploy).Deploy()
   do ##class(%File).CopyFile("/opt/irisbuild/src/web/feeling.html", "/usr/irissys/csp/user/feeling.html", 0, .return)
   do $system.Security.Login("SuperUser", "sys")
+  set production="St.Vectorsearch.Demo.Production"
   if '##class(Ens.Director).IsProductionRunning(production)
 		{
 			write !,"Running production"

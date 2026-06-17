@@ -1,4 +1,4 @@
-Class St.Vectorsearch.Demo.Msg.Movie.Movie Extends (%SerialObject, %XML.Adaptor, %JSON.Adaptor)
+Class St.Vectorsearch.Demo.Msg.Movies.Movies Extends (%SerialObject, %XML.Adaptor, %JSON.Adaptor)
 {
 
     /// Id of the movie
@@ -42,9 +42,10 @@ Class St.Vectorsearch.Demo.Msg.Movie.Movie Extends (%SerialObject, %XML.Adaptor,
 
     /// Fourth star of the movie
     Property Star4 As %String(MAXLEN = 255);
+
 Storage Default
 {
-<Data name="MovieState">
+<Data name="MoviesState">
 <Value name="1">
 <Value>Id</Value>
 </Value>
@@ -88,8 +89,8 @@ Storage Default
 <Value>Star4</Value>
 </Value>
 </Data>
-<State>MovieState</State>
-<StreamLocation>^St.Vectorsearch.DemoF61.MovieS</StreamLocation>
+<State>MoviesState</State>
+<StreamLocation>^St.Vectorsearch.DemoD8F.MoviesS</StreamLocation>
 <Type>%Storage.Serial</Type>
 }
 
