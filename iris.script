@@ -2,6 +2,7 @@
   Do ##class(Security.Users).UnExpireUserPasswords("*")
   set prop("DeepSeeEnabled")=1
   do ##class(Security.Applications).Modify("/csp/user",.prop)
+  do $SYSTEM.SQL.Execute("UPDATE Security.Resources set PublicPermission = 1 where ID = '%db_user'")
   zn "USER"
   set version="latest" 
   set request=##class(%Net.HttpRequest).%New()
@@ -12,26 +13,13 @@
   zpm "enable -community"
   zpm "install iris-deploy-tools -v"
   hang 2
-  do $system.OBJ.Import("/opt/irisbuild/src/St/Vectorsearch","ck")
+  do $system.OBJ.Import("/opt/irisbuild/src/St/Vectorsearch","ck", , 1)
+  hang 2
   do ##class(St.Vectorsearch.Data).Init()
   Do ##class(St.Vectorsearch.Data).Populate()
   do ##class(St.Vectorsearch.Data).InitMovie()
   do ##class(St.Vectorsearch.Data).PopulateMovie()
-  do ##class(St.Vectorsearch.Demo.Deploy).Deploy()
   do ##class(%File).CopyFile("/opt/irisbuild/src/web/feeling.html", "/usr/irissys/csp/user/feeling.html", 0, .return)
   do ##class(%File).CopyFile("/opt/irisbuild/src/web/movies.html", "/usr/irissys/csp/user/movies.html", 0, .return)
-  do $system.Security.Login("SuperUser", "sys")
-  set production="St.Vectorsearch.Demo.Production"
-  if '##class(Ens.Director).IsProductionRunning(production)
-		{
-			write !,"Running production"
-			do ##class(Ens.Director).StartProduction(production)
-			do ##class(Ens.Director).SetAutoStart(production, 1)
-		}
-		else
-		{
-			write !,"Restart production"
-			do ##class(Ens.Director).RestartProduction(0,1)
-		}
-    hang 2
+  hang 2
   halt

@@ -164,8 +164,9 @@
             movieDetailsElement.innerHTML = `
                 <div class=\"card\">
                     <div class=\"row g-0\">
-                        <div class=\"col-md-4\">
-                            <img src=\"${movie.Link}\" class=\"img-fluid rounded-start\" style=\"width: 200%\" alt=\"${movie.Title} Poster\">\
+                        <div class=\"col-md-4\" style=\"display: flex; justify-content: center; align-items: center;\">\
+                            <img src=\"${movie.Link}\" class=\"img-fluid rounded-start\" style=\"width: 200%\" alt=\"${movie.Title} Poster\" onerror=\"this.style.display='none'; this.nextElementSibling.style.display='block';\">
+                            <span style="display: none; color: gray; text-align: center;">Not available</span>
                         </div>
                         <div class=\"col-md-8\">\
                             <div class=\"card-body\">\
